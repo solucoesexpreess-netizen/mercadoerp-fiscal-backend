@@ -7,7 +7,7 @@ import { JwtService } from '@nestjs/jwt';
  * Endpoint para gestorbetao.base44.app autenticar no backend
  * e receber JWT para emitir NFC-e
  */
-@Controller('api/v1/base44')
+@Controller('base44')
 export class Base44AuthController {
   private readonly logger = new Logger('Base44Auth');
 
