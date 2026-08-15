@@ -13,15 +13,26 @@ import { JwtStrategy } from './jwt.strategy';
     TypeOrmModule.forFeature([Usuario]),
     PassportModule.register({ defaultStrategy: 'jwt' }),
     JwtModule.registerAsync({
-      useFactory: () => ({
-        privateKey: process.env.JWT_PRIVATE_KEY_PATH
-          ? require('fs').readFileSync(process.env.JWT_PRIVATE_KEY_PATH)
-          : 'dev-insecure-secret',
-        signOptions: { algorithm: 'RS256', expiresIn: Number(process.env.JWT_ACCESS_TTL || 900) },
-      }),
+      useFactory: () => {
+        const privateKey = process.env.JWT_PRIVATE_KEY;
+
+        if (!privateKey) {
+          throw new Error(
+            'JWT_PRIVATE_KEY não configurada. Configure a chave privada RSA no Railway.',
+          );
+        }
+
+        return {
+          privateKey: privateKey.replace(/\\n/g, '\n'),
+          signOptions: {
+            algorithm: 'RS256',
+            expiresIn: Number(process.env.JWT_ACCESS_TTL || 900),
+          },
+        };
+      },
     }),
   ],
- controllers: [AuthController, Base44AuthController],
+  controllers: [AuthController, Base44AuthController],
   providers: [AuthService, JwtStrategy],
   exports: [AuthService, JwtModule],
 })
